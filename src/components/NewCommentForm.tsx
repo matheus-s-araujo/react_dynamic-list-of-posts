@@ -1,8 +1,17 @@
-import React from 'react';
+import classNames from 'classnames';
+import { useState } from 'react';
 
-export const NewCommentForm: React.FC = () => {
+type NewCommentFormProps = {
+  onNewComment: () => void;
+};
+
+export const NewCommentForm = ({ onNewComment }: NewCommentFormProps) => {
+  const [authorName, setAuthorName] = useState<string>('');
+  const [authorEmail, setAuthorEmail] = useState<string>('');
+  const [authorText, setAuthorText] = useState<string>('');
+
   return (
-    <form data-cy="NewCommentForm">
+    <form data-cy="NewCommentForm" onSubmit={onNewComment}>
       <div className="field" data-cy="NameField">
         <label className="label" htmlFor="comment-author-name">
           Author Name
@@ -14,7 +23,9 @@ export const NewCommentForm: React.FC = () => {
             name="name"
             id="comment-author-name"
             placeholder="Name Surname"
-            className="input is-danger"
+            className={classNames('input', { 'is-danger': !authorName })}
+            value={authorName}
+            onChange={event => setAuthorName(event.target.value)}
           />
 
           <span className="icon is-small is-left">
@@ -45,7 +56,9 @@ export const NewCommentForm: React.FC = () => {
             name="email"
             id="comment-author-email"
             placeholder="email@test.com"
-            className="input is-danger"
+            className={classNames('input', { 'is-danger': !authorEmail })}
+            value={authorEmail}
+            onChange={event => setAuthorEmail(event.target.value)}
           />
 
           <span className="icon is-small is-left">
@@ -75,7 +88,9 @@ export const NewCommentForm: React.FC = () => {
             id="comment-body"
             name="body"
             placeholder="Type comment here"
-            className="textarea is-danger"
+            className={classNames('textarea', { 'is-danger': authorText })}
+            value={authorText}
+            onChange={event => setAuthorText(event.target.value)}
           />
         </div>
 

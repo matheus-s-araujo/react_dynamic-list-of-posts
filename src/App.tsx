@@ -8,11 +8,36 @@ import { PostsList } from './components/PostsList';
 import { PostDetails } from './components/PostDetails';
 import { UserSelector } from './components/UserSelector';
 import { Loader } from './components/Loader';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { User } from './types/User';
+import { getUserPosts } from './api/users';
+import { Post } from './types/Post';
 
 export const App = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [userPosts, setUserPosts] = useState<Post[] | null>(null);
+  const [loadingPosts, setLoadingPosts] = useState<boolean>(false);
+  const [postsErrorMessage, setPostsErrorMessage] = useState<string>('');
+
+  useEffect(() => {
+    if (selectedUser) {
+      setLoadingPosts(true);
+
+      getUserPosts(selectedUser.id)
+        .then(setUserPosts)
+        .catch(() => {
+          setPostsErrorMessage('Something went wrong!');
+        })
+        .finally(() => {
+          setLoadingPosts(false);
+        });
+    }
+  }, [selectedUser]);
+
+  const handleOpenPost = (post: Post) => {
+    setSelectedPost(prev => (prev?.id === post.id ? null : post));
+  };
 
   return (
     <main className="section">
@@ -32,20 +57,26 @@ export const App = () => {
                   <p data-cy="NoSelectedUser">No user selected</p>
                 )}
 
-                <Loader />
-
-                <div
-                  className="notification is-danger"
-                  data-cy="PostsLoadingError"
-                >
-                  Something went wrong!
-                </div>
-
-                <div className="notification is-warning" data-cy="NoPostsYet">
-                  No posts yet
-                </div>
-
-                <PostsList />
+                {loadingPosts ? (
+                  <Loader />
+                ) : postsErrorMessage ? (
+                  <div
+                    className="notification is-danger"
+                    data-cy="PostsLoadingError"
+                  >
+                    {postsErrorMessage}
+                  </div>
+                ) : userPosts && userPosts.length === 0 && selectedUser ? (
+                  <div className="notification is-warning" data-cy="NoPostsYet">
+                    No posts yet
+                  </div>
+                ) : userPosts && userPosts.length > 0 && selectedUser ? (
+                  <PostsList
+                    userPosts={userPosts || []}
+                    selectedPost={selectedPost}
+                    onSelect={handleOpenPost}
+                  />
+                ) : null}
               </div>
             </div>
           </div>
@@ -57,11 +88,11 @@ export const App = () => {
               'is-parent',
               'is-8-desktop',
               'Sidebar',
-              'Sidebar--open',
+              { 'Sidebar--open': selectedPost },
             )}
           >
             <div className="tile is-child box is-success ">
-              <PostDetails />
+              <PostDetails selectedPost={selectedPost} />
             </div>
           </div>
         </div>
