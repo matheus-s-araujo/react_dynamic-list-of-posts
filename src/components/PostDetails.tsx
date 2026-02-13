@@ -2,8 +2,8 @@ import { Loader } from './Loader';
 import { NewCommentForm } from './NewCommentForm';
 import { Post } from '../types/Post';
 import { useEffect, useState } from 'react';
-import { getPostComments } from '../api/users';
-import { Comment } from '../types/Comment';
+import { getPostComments, postNewComment } from '../api/users';
+import { Comment, CommentData } from '../types/Comment';
 
 type PostDetailsProps = {
   selectedPost: Post | null;
@@ -14,6 +14,7 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
   const [commentsErrorMessage, setCommentsErrorMessage] = useState<string>('');
   const [postComments, setPostComments] = useState<Comment[]>([]);
   const [showWriteComment, setShowWriteComment] = useState<boolean>(true);
+  const [loadingFormSubmit, setLoadingFormSubmit] = useState<boolean>(false);
 
   useEffect(() => {
     if (selectedPost) {
@@ -30,14 +31,21 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
     setShowWriteComment(prev => !prev);
   };
 
-  const handleNewComment = () => {
-    //   setPostComments(prev => [...prev, {
-    //     id:,
-    //     postId:,
-    //     name: authorName,
-    //     email: authorEmail,
-    //     body: authorText,
-    // }]);
+  const handleNewComment = (name: string, email: string, body: string) => {
+    const newComment: CommentData = { name, email, body };
+
+    if (selectedPost) {
+      setLoadingFormSubmit(true);
+
+      postNewComment(newComment, selectedPost.id)
+        .then(comment => {
+          setPostComments(prev => [...prev, comment]);
+        })
+        .catch()
+        .finally(() => {
+          setLoadingFormSubmit(false);
+        });
+    }
   };
 
   return (
@@ -106,7 +114,10 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
         </div>
 
         {!showWriteComment && (
-          <NewCommentForm onNewComment={handleNewComment} />
+          <NewCommentForm
+            onNewComment={handleNewComment}
+            loadingFormSubmit={loadingFormSubmit}
+          />
         )}
       </div>
     </div>

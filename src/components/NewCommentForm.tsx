@@ -1,17 +1,38 @@
+/* eslint-disable @typescript-eslint/indent */
 import classNames from 'classnames';
 import { useState } from 'react';
 
 type NewCommentFormProps = {
-  onNewComment: () => void;
+  onNewComment: (name: string, email: string, text: string) => void;
+  loadingFormSubmit: boolean;
 };
 
-export const NewCommentForm = ({ onNewComment }: NewCommentFormProps) => {
+export const NewCommentForm = ({
+  onNewComment,
+  loadingFormSubmit,
+}: NewCommentFormProps) => {
   const [authorName, setAuthorName] = useState<string>('');
   const [authorEmail, setAuthorEmail] = useState<string>('');
   const [authorText, setAuthorText] = useState<string>('');
 
+  const handleFormSubmit = (
+    event:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.preventDefault();
+
+    onNewComment(authorName, authorEmail, authorText);
+  };
+
+  const handleClearForm = () => {
+    setAuthorName('');
+    setAuthorEmail('');
+    setAuthorText('');
+  };
+
   return (
-    <form data-cy="NewCommentForm" onSubmit={onNewComment}>
+    <form data-cy="NewCommentForm" onSubmit={event => handleFormSubmit(event)}>
       <div className="field" data-cy="NameField">
         <label className="label" htmlFor="comment-author-name">
           Author Name
@@ -88,7 +109,7 @@ export const NewCommentForm = ({ onNewComment }: NewCommentFormProps) => {
             id="comment-body"
             name="body"
             placeholder="Type comment here"
-            className={classNames('textarea', { 'is-danger': authorText })}
+            className={classNames('textarea', { 'is-danger': !authorText })}
             value={authorText}
             onChange={event => setAuthorText(event.target.value)}
           />
@@ -101,14 +122,24 @@ export const NewCommentForm = ({ onNewComment }: NewCommentFormProps) => {
 
       <div className="field is-grouped">
         <div className="control">
-          <button type="submit" className="button is-link is-loading">
+          <button
+            type="submit"
+            className={classNames('button is-link', {
+              'is-loading': loadingFormSubmit,
+            })}
+            onClick={event => handleFormSubmit(event)}
+          >
             Add
           </button>
         </div>
 
         <div className="control">
           {/* eslint-disable-next-line react/button-has-type */}
-          <button type="reset" className="button is-link is-light">
+          <button
+            type="reset"
+            className="button is-link is-light"
+            onClick={handleClearForm}
+          >
             Clear
           </button>
         </div>
