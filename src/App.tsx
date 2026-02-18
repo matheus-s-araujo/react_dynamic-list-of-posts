@@ -21,6 +21,8 @@ export const App = () => {
   const [postsErrorMessage, setPostsErrorMessage] = useState<string>('');
 
   useEffect(() => {
+    setPostsErrorMessage('');
+
     if (selectedUser) {
       setLoadingPosts(true);
       setSelectedPost(null);

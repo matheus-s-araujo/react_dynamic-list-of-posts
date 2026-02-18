@@ -18,13 +18,17 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
   const [loadingFormSubmit, setLoadingFormSubmit] = useState<boolean>(false);
 
   useEffect(() => {
+    setCommentsErrorMessage('');
+
     if (selectedPost) {
       setLoadingComments(true);
 
       getPostComments(selectedPost.id)
         .then(setPostComments)
         .catch(() => setCommentsErrorMessage('Something went wrong'))
-        .finally(() => setLoadingComments(false));
+        .finally(() => {
+          setLoadingComments(false);
+        });
     }
   }, [selectedPost]);
 

@@ -24,7 +24,7 @@ export const NewCommentForm = ({
     event.preventDefault();
     setFormSubmited(true);
 
-    if (authorName && authorEmail && authorText) {
+    if (authorName.trim() && authorEmail.trim() && authorText.trim()) {
       onNewComment(authorName, authorEmail, authorText);
       setFormSubmited(false);
       setAuthorText('');
@@ -150,7 +150,6 @@ export const NewCommentForm = ({
             className={classNames('button is-link', {
               'is-loading': loadingFormSubmit,
             })}
-            onClick={event => handleFormSubmit(event)}
           >
             Add
           </button>
