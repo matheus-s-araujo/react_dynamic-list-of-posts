@@ -23,6 +23,7 @@ export const App = () => {
   useEffect(() => {
     if (selectedUser) {
       setLoadingPosts(true);
+      setSelectedPost(null);
 
       getUserPosts(selectedUser.id)
         .then(setUserPosts)
@@ -90,10 +91,13 @@ export const App = () => {
               'Sidebar',
               { 'Sidebar--open': selectedPost },
             )}
+            key={selectedPost?.id}
           >
-            <div className="tile is-child box is-success ">
-              <PostDetails selectedPost={selectedPost} />
-            </div>
+            {selectedPost && (
+              <div className="tile is-child box is-success ">
+                <PostDetails selectedPost={selectedPost} />
+              </div>
+            )}
           </div>
         </div>
       </div>

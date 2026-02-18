@@ -30,10 +30,19 @@ export const UserSelector = ({
     setOpenList(false);
   };
 
+  const handleBlur = (event: React.FocusEvent) => {
+    if (event.currentTarget.contains(event.relatedTarget as Node)) {
+      return;
+    }
+
+    setOpenList(false);
+  };
+
   return (
     <div
       data-cy="UserSelector"
       className={classNames('dropdown', { 'is-active': openList })}
+      onBlur={event => handleBlur(event)}
     >
       <div className="dropdown-trigger">
         <button
@@ -61,7 +70,9 @@ export const UserSelector = ({
             return (
               <a
                 href={`#user-${user.id}`}
-                className="dropdown-item"
+                className={classNames('dropdown-item', {
+                  'is-active': selectedUser?.id === user.id,
+                })}
                 key={user.id}
                 onClick={() => handleUserSelected(user)}
               >

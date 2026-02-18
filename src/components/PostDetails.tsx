@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/indent */
 import { Loader } from './Loader';
 import { NewCommentForm } from './NewCommentForm';
 import { Post } from '../types/Post';
 import { useEffect, useState } from 'react';
-import { getPostComments, postNewComment } from '../api/users';
+import { deleteComment, getPostComments, postNewComment } from '../api/users';
 import { Comment, CommentData } from '../types/Comment';
 
 type PostDetailsProps = {
@@ -26,6 +27,22 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
         .finally(() => setLoadingComments(false));
     }
   }, [selectedPost]);
+
+  const handleDeleteComment = (commentDeleted: Comment) => {
+    if (commentDeleted) {
+      setPostComments(
+        postComments.filter(comment => {
+          if (comment.id !== commentDeleted.id) {
+            return true;
+          } else {
+            return false;
+          }
+        }),
+      );
+
+      deleteComment(commentDeleted.id);
+    }
+  };
 
   const handleWriteComment = () => {
     setShowWriteComment(prev => !prev);
@@ -88,6 +105,7 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
                       type="button"
                       className="delete is-small"
                       aria-label="delete"
+                      onClick={() => handleDeleteComment(comment)}
                     >
                       delete button
                     </button>
@@ -101,16 +119,19 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
             </>
           ) : null}
 
-          {showWriteComment && selectedPost !== null && (
-            <button
-              data-cy="WriteCommentButton"
-              type="button"
-              className="button is-link"
-              onClick={handleWriteComment}
-            >
-              Write a comment
-            </button>
-          )}
+          {showWriteComment &&
+            selectedPost !== null &&
+            !loadingComments &&
+            !commentsErrorMessage && (
+              <button
+                data-cy="WriteCommentButton"
+                type="button"
+                className="button is-link"
+                onClick={handleWriteComment}
+              >
+                Write a comment
+              </button>
+            )}
         </div>
 
         {!showWriteComment && (
