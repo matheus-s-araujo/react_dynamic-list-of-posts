@@ -7,14 +7,27 @@ type NewCommentFormProps = {
   loadingFormSubmit: boolean;
 };
 
+type NewCommentFormState = {
+  authorName: string;
+  authorEmail: string;
+  authorText: string;
+  formSubmited: boolean;
+};
+
 export const NewCommentForm = ({
   onNewComment,
   loadingFormSubmit,
 }: NewCommentFormProps) => {
-  const [authorName, setAuthorName] = useState<string>('');
-  const [authorEmail, setAuthorEmail] = useState<string>('');
-  const [authorText, setAuthorText] = useState<string>('');
-  const [formSubmited, setFormSubmited] = useState<boolean>(false);
+  const [state, setState] = useState<NewCommentFormState>({
+    authorName: '',
+    authorEmail: '',
+    authorText: '',
+    formSubmited: false,
+  });
+
+  const handleUpdateState = (stateUpdate: Partial<NewCommentFormState>) => {
+    setState(prev => ({ ...prev, ...stateUpdate }));
+  };
 
   const handleFormSubmit = (
     event:
@@ -22,20 +35,25 @@ export const NewCommentForm = ({
       | React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.preventDefault();
-    setFormSubmited(true);
+    handleUpdateState({ formSubmited: true });
 
-    if (authorName.trim() && authorEmail.trim() && authorText.trim()) {
-      onNewComment(authorName, authorEmail, authorText);
-      setFormSubmited(false);
-      setAuthorText('');
+    if (
+      state.authorName.trim() &&
+      state.authorEmail.trim() &&
+      state.authorText.trim()
+    ) {
+      onNewComment(state.authorName, state.authorEmail, state.authorText);
+      handleUpdateState({ authorText: '', formSubmited: false });
     }
   };
 
   const handleClearForm = () => {
-    setAuthorName('');
-    setAuthorEmail('');
-    setAuthorText('');
-    setFormSubmited(false);
+    handleUpdateState({
+      authorName: '',
+      authorEmail: '',
+      authorText: '',
+      formSubmited: false,
+    });
   };
 
   return (
@@ -52,17 +70,19 @@ export const NewCommentForm = ({
             id="comment-author-name"
             placeholder="Name Surname"
             className={classNames('input', {
-              'is-danger': !authorName && formSubmited,
+              'is-danger': !state.authorName.trim() && state.formSubmited,
             })}
-            value={authorName}
-            onChange={event => setAuthorName(event.target.value)}
+            value={state.authorName}
+            onChange={event =>
+              handleUpdateState({ authorName: event.target.value })
+            }
           />
 
           <span className="icon is-small is-left">
             <i className="fas fa-user" />
           </span>
 
-          {!authorName && formSubmited && (
+          {!state.authorName.trim() && state.formSubmited && (
             <span
               className="icon is-small is-right has-text-danger"
               data-cy="ErrorIcon"
@@ -72,7 +92,7 @@ export const NewCommentForm = ({
           )}
         </div>
 
-        {!authorName && formSubmited && (
+        {!state.authorName.trim() && state.formSubmited && (
           <p className="help is-danger" data-cy="ErrorMessage">
             Name is required
           </p>
@@ -91,17 +111,19 @@ export const NewCommentForm = ({
             id="comment-author-email"
             placeholder="email@test.com"
             className={classNames('input', {
-              'is-danger': !authorEmail && formSubmited,
+              'is-danger': !state.authorEmail.trim() && state.formSubmited,
             })}
-            value={authorEmail}
-            onChange={event => setAuthorEmail(event.target.value)}
+            value={state.authorEmail}
+            onChange={event =>
+              handleUpdateState({ authorEmail: event.target.value })
+            }
           />
 
           <span className="icon is-small is-left">
             <i className="fas fa-envelope" />
           </span>
 
-          {!authorEmail && formSubmited && (
+          {!state.authorEmail.trim() && state.formSubmited && (
             <span
               className="icon is-small is-right has-text-danger"
               data-cy="ErrorIcon"
@@ -111,7 +133,7 @@ export const NewCommentForm = ({
           )}
         </div>
 
-        {!authorEmail && formSubmited && (
+        {!state.authorEmail.trim() && state.formSubmited && (
           <p className="help is-danger" data-cy="ErrorMessage">
             Email is required
           </p>
@@ -129,14 +151,16 @@ export const NewCommentForm = ({
             name="body"
             placeholder="Type comment here"
             className={classNames('textarea', {
-              'is-danger': !authorText && formSubmited,
+              'is-danger': !state.authorText.trim() && state.formSubmited,
             })}
-            value={authorText}
-            onChange={event => setAuthorText(event.target.value)}
+            value={state.authorText}
+            onChange={event =>
+              handleUpdateState({ authorText: event.target.value })
+            }
           />
         </div>
 
-        {!authorText && formSubmited && (
+        {!state.authorText.trim() && state.formSubmited && (
           <p className="help is-danger" data-cy="ErrorMessage">
             Enter some text
           </p>

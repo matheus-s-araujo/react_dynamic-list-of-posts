@@ -62,7 +62,6 @@ export const PostDetails = ({ selectedPost }: PostDetailsProps) => {
         .then(comment => {
           setPostComments(prev => [...prev, comment]);
         })
-        .catch()
         .finally(() => {
           setLoadingFormSubmit(false);
         });
